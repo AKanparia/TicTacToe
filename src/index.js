@@ -33,12 +33,8 @@ const Square = props => {
 
 class Board extends React.Component {
   renderSquare(i) {
-    return (
-      <Square
-        value={this.props.squares[i]}
-        handleClick={() => this.props.handleClick(i)}
-      />
-    );
+    const { squares, handleClick } = this.props;
+    return <Square value={squares[i]} handleClick={() => handleClick(i)} />;
   }
 
   render() {
