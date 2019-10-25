@@ -32,43 +32,18 @@ const Square = props => {
 };
 
 class Board extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      squares: Array(9).fill(null),
-      xIsNext: true
-    };
-  }
-
   renderSquare(i) {
     return (
       <Square
-        value={this.state.squares[i]}
-        handleClick={() => this.handleClick(i)}
+        value={this.props.squares[i]}
+        handleClick={() => this.props.handleClick(i)}
       />
     );
   }
 
-  handleClick = i => {
-    let squares = [...this.state.squares];
-    if (calculateWinner(squares) || squares[i]) return;
-    squares[i] = this.state.xIsNext ? "X" : "O";
-    this.setState(prevState => ({
-      squares,
-      xIsNext: !prevState.xIsNext
-    }));
-  };
-
   render() {
-    const winner = calculateWinner(this.state.squares);
-    let status;
-    status = winner
-      ? `Winner: ${winner}`
-      : `Next player: ${this.state.xIsNext ? "X" : "O"}`;
-
     return (
       <div>
-        <div className="status">{status}</div>
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -90,14 +65,45 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      history: [{ squares: Array(9).fill(null) }],
+      xIsNext: true
+    };
+  }
+
+  handleClick = i => {
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    let squares = [...current.squares];
+    if (calculateWinner(squares) || squares[i]) return;
+    squares[i] = this.state.xIsNext ? "X" : "O";
+    this.setState(prevState => ({
+      history: [...prevState.history, { squares }],
+      xIsNext: !prevState.xIsNext
+    }));
+  };
+
   render() {
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const winner = calculateWinner(current.squares);
+
+    const status = winner
+      ? `Winner: ${winner}`
+      : `Next player: ${this.state.xIsNext ? "X" : "O"}`;
+
     return (
       <div className="game">
         <div className="game-board">
-          <Board />
+          <Board
+            squares={current.squares}
+            handleClick={i => this.handleClick(i)}
+          />
         </div>
         <div className="game-info">
-          <div>{/* status */}</div>
+          <div>{status}</div>
           <ol>{/* TODO */}</ol>
         </div>
       </div>
